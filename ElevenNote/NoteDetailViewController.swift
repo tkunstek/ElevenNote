@@ -9,61 +9,30 @@ import UIKit
 
 class NoteDetailViewController: UIViewController {
     
-    // Note we are editing / creating
-    var note = Note()
+    var theNote = Note()
     
-    // Completion block to call when user taps save
-    var completion : ( (Note) -> () )?
-    // Block to call when user taps cancel
-    var cancel : (() -> ())?
+    @IBOutlet weak var noteTitleLabel: UITextField!
     
-    // Interface builder outlets
-    @IBOutlet weak var titleTextField: UITextField!
-    @IBOutlet weak var noteTextField: UITextView!
+    @IBOutlet weak var noteTextView: UITextView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Update the screen with the note content
-        titleTextField.text = note.title
-        noteTextField.text = note.text
+        // The view starts here. By now we either have a note to edit
+        // or we have a blank note in theNote property we can use
         
-        self.title = note.title
+        // Update the screen with the contents of theNote
+        self.noteTitleLabel.text = theNote.title
+        self.noteTextView.text = theNote.text
         
-        // Give focus to the note text area
-        titleTextField.becomeFirstResponder()
-        
+        // Set the Cursor in the note text area
+        self.noteTextView.becomeFirstResponder()
     }
     
-    
-    @IBAction func saveTapped(sender: AnyObject) {
-        
-        // If we have a completion block set, call it
-        if let doSave = completion {
-            note.title = titleTextField.text
-            note.text = noteTextField.text
-            doSave(note)
-        }
-        
-        // Dismiss note detail view
-        if self.navigationController != nil {
-            self.navigationController!.popViewControllerAnimated(true)
-        }
-        
-    }
-    
-    @IBAction func cancelTapped(sender: AnyObject) {
-        
-        // If we have a cancel block set, call it
-        if let doCancel = cancel {
-            doCancel()
-        }
-        
-        // Dismiss note detail view
-        if self.navigationController != nil {
-            self.navigationController!.popViewControllerAnimated(true)
-        }
-        
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        // Whenever we leave the screen, update our note model
+        theNote.title = self.noteTitleLabel.text
+        theNote.text = self.noteTextView.text
     }
     
 }

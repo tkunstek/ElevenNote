@@ -5,10 +5,10 @@
 //  Copyright (c) 2014 ElevenFifty. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 class NoteStore {
-    // MARK: Singleton Pattern
+    // Mark: Singleton Pattern (hacked since we don't have class var's yet)
     class var sharedNoteStore : NoteStore {
     struct Static {
         static let instance : NoteStore = NoteStore()
@@ -21,74 +21,75 @@ class NoteStore {
         load()
     }
     
-    // MARK: Properties
+    // Array to hold our notes
+    private var notes : [Note]!
     
-    // Collection of all notes. Exposing the raw array for simplicity
-    var allNotes : [Note]!
+    // CRUD - Create, Read, Update, Delete
     
+    // Create
     
-    // MARK: Methods
+    func createNote(theNote:Note = Note()) -> Note {
+        notes.append(theNote)
+        return theNote
+    }
     
-    // Fetch a specific note
+    // Read
+    
     func getNote(index:Int) -> Note {
-        return allNotes[index]
+        return notes[index]
     }
     
-    // count
-    func noteCount() -> Int
-    {
-        return allNotes.count
+    // Update: Notes passed by reference, no update code needed
+    
+    // Delete
+    func deleteNote(index:Int) {
+        notes.removeAtIndex(index)
     }
     
-    // create a note
-    func createNote() -> Note {
-        var note = Note()
-        allNotes.append(note)
-        return note
-    }
-    
-    // deleting a note
-    func deleteNote(noteToDelete:Note) {
+    func deleteNote(withNote:Note) {
         
-        // Look at each note
-        for (i, note) in enumerate(allNotes) {
-            // And find a matching instance to remove
-            if note === noteToDelete {
-                allNotes.removeAtIndex(i)
+        for (i, note) in enumerate(notes) {
+            if note === withNote {
+                notes.removeAtIndex(i)
                 return
             }
         }
         
     }
     
-    // MARK: Persistence
+    // Count
+    func count() -> Int {
+        return notes.count
+    }
     
-    // 1: Find the file & directory we want to save to
+    
+    // Mark: Persistence
+    
+    // 1: Find the file & directory we want to save to...
     func archiveFilePath() -> String {
-        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true) as NSArray
-        let documentsDirectory = paths.objectAtIndex(0) as NSString
+        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
+        let documentsDirectory = paths.first as NSString
         let path = documentsDirectory.stringByAppendingPathComponent("NoteStore.plist")
         
         return path
     }
     
-    // 2: Do the save to disk
+    // 2: Do the save to disk.....
     func save() {
-        NSKeyedArchiver.archiveRootObject(allNotes, toFile: archiveFilePath())
+        NSKeyedArchiver.archiveRootObject(notes, toFile: archiveFilePath())
     }
     
-    // 3: Do the reload from disk
+    
+    // 3: Do the reload from disk....
     func load() {
         let filePath = archiveFilePath()
         let fileManager = NSFileManager.defaultManager()
         
         if fileManager.fileExistsAtPath(filePath) {
-            allNotes = NSKeyedUnarchiver.unarchiveObjectWithFile(filePath) as [Note]
+            notes = NSKeyedUnarchiver.unarchiveObjectWithFile(filePath) as [Note]
         } else {
-            allNotes = [Note]()
+            notes = [Note]()
         }
-        
-        
     }
     
 }
