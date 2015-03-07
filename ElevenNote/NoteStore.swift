@@ -39,7 +39,10 @@ class NoteStore {
         return notes[index]
     }
     
-    // Update: Notes passed by reference, no update code needed
+    // Update
+    func updateNote(#theNote:Note) {
+        // Notes passed by reference, no update code needed
+    }
     
     // Delete
     func deleteNote(index:Int) {

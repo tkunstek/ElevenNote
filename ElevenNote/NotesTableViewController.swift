@@ -17,6 +17,8 @@ class NotesTableViewController: UITableViewController {
     }
     
     override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        // ensure we are not in edit mode
         editing = false
     }
     
@@ -40,16 +42,21 @@ class NotesTableViewController: UITableViewController {
         var noteDetail = segue.sourceViewController as NoteDetailViewController
         
         // If there is a row selected....
-        if let selectedRow = tableView.indexPathForSelectedRow() {
+        if let indexPath = tableView.indexPathForSelectedRow() {
+            // Update note in our store
+            NoteStore.sharedNoteStore.updateNote(theNote: noteDetail.theNote)
+            
             // The user was in edit mode
-            tableView.reloadRowsAtIndexPaths([selectedRow], withRowAnimation: UITableViewRowAnimation.Automatic)
+            tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
         } else {
             // Otherwise, add a new record
             NoteStore.sharedNoteStore.createNote(theNote: noteDetail.theNote)
             
-            var newIndexPath = NSIndexPath(forRow: NoteStore.sharedNoteStore.count()-1, inSection: 0)
+            // Get an index to insert the row at
+            var indexPath = NSIndexPath(forRow: NoteStore.sharedNoteStore.count()-1, inSection: 0)
             
-            tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
+            // Update tableview
+            tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
         }
     }
     
